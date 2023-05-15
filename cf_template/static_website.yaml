@@ -1,0 +1,124 @@
+AWSTemplateFormatVersion: 2023-05-11
+
+Description: Deploy a static website
+
+Resources:
+  S3Bucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: s3_edgeduckgo
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: error.html
+    DeletionPolicy: Retain
+  BucketPolicy:
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      PolicyDocument:
+        Id: policy_edgeduckgo
+        Version: 2012-10-17
+        Statement:
+          - Sid: PublicReadForGetBucketObjects
+            Effect: Allow
+            Principal: '*'
+            Action: 's3:GetObject'
+            Resource: !Join 
+              - ''
+              - - 'arn:aws:s3:::'
+                - !Ref S3Bucket
+                - /*
+      Bucket: !Ref S3Bucket
+
+  NotificationConfiguration:
+      LambdaConfigurations:
+        - Event: "s3:ObjectCreated:*"
+          Function: !GetAtt LogsToCloudwatchLambda.Arn
+  DependsOn: PermissionForS3ToInvokeLogsToCloudwatchLambda
+
+  # Permission for s3 to invoke lambda which will fetch the logs from s3 and store in cloudwatch
+  PermissionForS3ToInvokeLogsToCloudwatchLambda:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: "lambda:InvokeFunction"
+      FunctionName: !GetAtt LogsToCloudwatchLambda.Arn
+      Principal: "s3.amazonaws.com"
+      SourceArn: !Join ["", ["arn:aws:s3:::", !Sub "logs-${ProjectName}"]]
+
+
+  # Lambda to move logs from S3 logs bucket to cloudwatch
+  LogsToCloudwatchLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Lambda to move logs from S3 logs bucket to cloudwatch
+      Handler: readS3Logs.handler
+      Role: !GetAtt LogsToCloudwatchLambdaExecutionRole.Arn
+      Code:
+        S3Bucket: !Join
+          - ""
+          - - !ImportValue LambdaCodeBucket
+        S3Key: "lambdas/readS3Logs.zip"
+      Environment:
+        Variables:
+          S3_LOG_GROUP: !Ref SiteLogGroup
+          CF_LOG_GROUP: !Ref CloudfrontLogGroup
+      Timeout: 30
+      Runtime: python3.10
+
+  # Role for Lambda to access objects within S3 Logs bucket
+  LogsToCloudwatchLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: { Service: [lambda.amazonaws.com] }
+            Action: ["sts:AssumeRole"]
+      Path: /
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      Policies:
+        - PolicyName: S3Policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "S3:GetObject"
+                  - "s3:PutObject"
+                  - "S3:DeleteObject"
+                Resource: !Sub "arn:aws:s3:::logs-${ProjectName}/*"
+              - Effect: "Allow"
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                  - "logs:GetLogEvents"
+                  - "logs:DescribeLogStreams"
+                Resource: "arn:aws:logs:*:*:*"
+
+  # Log group for s3 access logs
+  SiteLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "s3_edgeduckgoS3Logs"
+
+
+Outputs:
+  WebsiteURL:
+    Value: !GetAtt 
+      - S3Bucket
+      - WebsiteURL
+    Description: URL for website hosted on S3
+  S3BucketSecureURL:
+    Value: !Join 
+      - ''
+      - - 'https://'
+        - !GetAtt 
+          - S3Bucket
+          - DomainName
+    Description: Name of S3 bucket to hold website content
+    
+  S3BucketName:
+   Value: !Ref s3_edgeduckgo
+   Description: Name of S3 bucket to hold website content.
