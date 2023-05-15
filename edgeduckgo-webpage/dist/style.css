@@ -1,0 +1,21 @@
+.dropdown {
+  display: inline-block;
+  position: relative;
+}
+
+body {
+  background: #C0C0CF;
+  text-align: center;
+  font-family: verdana;
+  color: #151B54;
+  font-weight: 700;
+}
+
+h1 {
+  font-size: 42px;
+}
+
+textarea {
+  width: 600px;
+  height: 150px;
+}
