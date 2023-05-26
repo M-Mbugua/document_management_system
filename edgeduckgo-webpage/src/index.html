@@ -1,33 +1,50 @@
-<h1 id="title">DOCUMENT MANAGEMENT SYSTEM</h1>
-<img src="https://blog.smartprint.com/hs-fs/hubfs/Imported_Blog_Media/secure-document-storage-digital-document-security-3.jpg?width=440&name=secure-document-storage-digital-document-security-3.jpg" alt="Secure Document">
-<h2><u>Step 1</u></h2>
-<p id="description">To upload your document, please select the S3 bucket from the drop-down menu below:</p>
-<div class="dropdown">
-<select name="bucket" id="bucket">
-  <option value="Choose" disabled>Choose...</option>
-  <option value="Bucket 1">https://s3.console.aws.amazon.com/s3/buckets/s3-edgeduckgo?region=us-west-2</option>
-</select>
-</div>
-<div>
-  <h2><u>Step 2</u></h2>
-<p>Upload your document in the area below and then hit the <i>Submit</i> button:</p>
-<textarea id="upload" class="inputarea" name="upload" placeholder="Supported formats are .csv, .docx and .txt"></textarea>
-</div>
-<br>
-<div>
-<form action="/action_page.php">
-  <input type="file" id="myFile" name="filename">
-</form>
-</div>
-<br>
-<body>
-  <a href="https://s3.console.aws.amazon.com/s3/buckets/s3-edgeduckgo?region=us-west-2">
-    <input type="submit"/>
-  </a>
-</body>
-<div>
-<footer>&copy; 2023 EdgeDuckGo</footer>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>EdgeDuckGo Webpage</title>
+    <link rel="stylesheet" href="./style.css">
+  </head>
 
+  <body>
+    <h1 id="title">DOCUMENT MANAGEMENT SYSTEM</h1>
+    <img src="https://blog.smartprint.com/hs-fs/hubfs/Imported_Blog_Media/secure-document-storage-digital-document-security-3.jpg?width=440&name=secure-document-storage-digital-document-security-3.jpg" alt="Secure Document">
+    <h2><u>Step 1</u></h2>
 
+    <p id="description">To upload your document, please select the S3 bucket from the drop-down menu below:</p>
 
+    <div class="dropdown">
+      <select name="bucket" id="bucket">
+        <option value="Choose" disabled>Choose...</option>
+        <option value="Bucket 1">EdgeDuckGo Bucket</option>
+      </select>
+    </div>
+
+    <div>
+      <h2><u>Step 2</u></h2>
+      <p>Upload your document in the area below and then hit the <i>Submit</i> button:</p>
+      <textarea id="upload" class="inputarea" name="upload" placeholder="Supported formats are .csv, .docx and .txt"></textarea>
+    </div>
+
+    <br>
+
+    <div>
+      <form action="/action_page.php">
+        <input type="file" id="myFile" name="filename">
+      </form>
+    </div>
+
+    <br>
+
+    <a href="https://s3.console.aws.amazon.com/s3/buckets/edgeduckgo-s3?region=us-west-2">
+        <input type="submit"/>
+    </a>
+
+    <div>
+      <br>
+      <footer>&copy; 2023 EdgeDuckGo</footer>
+    </div>
+
+  </body>
+
+</html>
